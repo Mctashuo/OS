@@ -25,8 +25,11 @@ private slots:      //槽
     void on_Insert_clicked();
     void updateview();
     void firstfit(double s);    //首次适应算法
-    void bestfit(double s);
+    void bestfit(double s);     //最佳适应算法
+    void worstfit(double s);    //最差适应算法
     void on_Add_clicked();
+
+    void on_Delete_clicked();
 
 private:
     Ui::MainWindow *ui;

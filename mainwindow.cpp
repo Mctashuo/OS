@@ -19,6 +19,7 @@ MainWindow::~MainWindow()
 }
 
 int MainWindow::id=0;   //进程id初始化为0
+//设置内存区块提示颜色
 void MainWindow::showhit()
 {
     QBrush a(Qt::blue);
@@ -212,9 +213,21 @@ bool compare(const QPair<double, double>&i, const QPair<double, double>&j)
 {
     return i.second < j.second;
 }
+//从大到小排序
+bool compare_2(const QPair<double, double>&i, const QPair<double, double>&j)
+{
+    return i.second > j.second;
+}
+
 void MainWindow::bestfit(double s)
 {
     qSort(FreeSpace.begin(),FreeSpace.end(),compare);
+    firstfit(s);
+}
+
+void MainWindow::worstfit(double s)
+{
+    qSort(FreeSpace.begin(),FreeSpace.end(),compare_2);
     firstfit(s);
 }
 
@@ -229,11 +242,11 @@ void MainWindow::on_Add_clicked()
     }
     else if(ui->bestfit->isChecked())
     {
-       //bestfit(s);
+       bestfit(s);
     }
-    else if(ui->radioButton->isChecked())
+    else if(ui->worstfit->isChecked())
     {
-       //worstfit(s);
+       worstfit(s);
     }
     else
     {
@@ -241,4 +254,90 @@ void MainWindow::on_Add_clicked()
            m.setText("You should determine algorithm");
            m.exec();
     }
+}
+
+void MainWindow::on_Delete_clicked()
+{
+    //进程id
+    int proid = ui->deallocation_id->text().toInt();
+    ui->deallocation_id->setText("");
+
+    //进程号索引
+    int x = 0;
+    //进程号是否存在标志
+    bool check;
+    //查找进程号是否存在
+    for(QVector<process>::iterator i = AllocateSpace.begin();i != AllocateSpace.end();i++)
+    {
+        if(i->getId() == proid)
+        {
+            check = TRUE;
+            break;
+        }
+
+        else
+        {
+            check = FALSE;
+            x++;
+        }
+    }
+    //如果不存在，弹出消息框提示
+    if(!check)
+    {
+        QMessageBox m;
+        m.setText("ID doesn't exist");
+        m.exec();
+        return;
+    }
+    //删除内存时确定是否需要加入新空闲内存
+    int flag = 0;
+    for(QVector < QPair<double,double> >::iterator i = FreeSpace.begin();i != FreeSpace.end();i++)
+    {
+        //如果进程内存空间之前和之后都是空闲空间，则不需要建立新空间
+        if(i != FreeSpace.end())
+        {
+
+            QVector<QPair<double, double> >::iterator temp = i;
+            temp++;
+
+            if(((i->first + i->second) == AllocateSpace[x].getAddress()) && (temp->first == AllocateSpace[x].getAddress() + AllocateSpace[x].getSize()))
+            {
+                flag = 1;
+                i->second += temp->second + AllocateSpace[x].getSize();
+                FreeSpace.erase(temp);
+                break;
+            }
+        }
+        //如果进程内存之后是空闲空间
+        if(i->first == AllocateSpace[x].getAddress() + AllocateSpace[x].getSize())
+        {
+            flag = 1;
+            i->first = AllocateSpace[x].getAddress();
+            i->second += AllocateSpace[x].getSize();
+            break;
+        }
+        //如果进程内存前后是空闲空间
+        if((i->first + i->second) == AllocateSpace[x].getAddress())
+        {
+            flag = 1;
+            i->second += AllocateSpace[x].getSize();
+            break;
+        }
+
+    }
+    //重新建立内存空间
+    if(flag == 0)
+    {
+        double newAddress = AllocateSpace[x].getAddress();
+        double newSize = AllocateSpace[x].getSize();
+        FreeSpace.push_back(qMakePair(newAddress,newSize));
+        qSort(FreeSpace.begin(),FreeSpace.end());
+
+    }
+    //删除占用的内存空间
+    AllocateSpace.remove(x);
+    updateview();
+
+
+
 }
