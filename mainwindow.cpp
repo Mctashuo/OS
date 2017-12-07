@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    ui->la->setText("Address \t Size \n");
     showhit();
 }
 
@@ -51,3 +51,18 @@ void MainWindow::on_Show_clicked()
 
 }
 
+
+void MainWindow::on_Insert_clicked()
+{
+    //设置内存地址和大小
+    double add= ui->memoryAddress->text().toDouble();
+    double siz = ui->memorySize->text().toDouble();
+    //内存加入空闲区
+    FreeSpace.push_back(qMakePair(add,siz));
+    //设置文字
+    QString temp = ui->la->text();
+    temp.append(ui->memoryAddress->text()+"\t"+ui->memorySize->text()+"\n");
+    ui->la->setText(temp);
+    ui->memoryAddress->setText("");
+    ui->memorySize->setText("");
+}
