@@ -28,18 +28,18 @@ void process::setSize(double _size)
 }
 
 
-void process::getAddress()
+double process::getAddress()
 {
     return address;
 }
 
-void process::getId()
+int process::getId()
 {
     return id;
 }
 
 
-void process::getSize()
+double process::getSize()
 {
     return size;
 }
