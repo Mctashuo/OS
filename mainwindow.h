@@ -25,6 +25,8 @@ private slots:      //槽
     void on_Insert_clicked();
     void updateview();
     void firstfit(double s);    //首次适应算法
+    void on_Add_clicked();
+
 private:
     Ui::MainWindow *ui;
 

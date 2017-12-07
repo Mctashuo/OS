@@ -82,8 +82,93 @@ void MainWindow::updateview()
         delete items[i];
     }
 
-    QBrush a(Qt::blue);
     qSort(FreeSpace.begin(),FreeSpace.end());
+    for(QVector < QPair<double, double> >::iterator i = FreeSpace.begin(); i != FreeSpace.end(); i++)
+    {
+        //空闲区上色
+        QGraphicsRectItem *fre = new QGraphicsRectItem();
+        fre->setRect(i->first,0,i->second,100);
+        QBrush fr(Qt::red);
+        fre->setBrush(fr);
+        scene->addItem(fre);
+        //锁定区上色
+        QVector <QPair<double, double> >::iterator k = i;
+        k--;
+
+        if(i != FreeSpace.begin() && (i->first > (k->first + k->second)))
+        {
+           //选择蓝色
+           QBrush a(Qt::blue);
+           QGraphicsRectItem * blo = new QGraphicsRectItem();
+           blo->setRect(k->first + k->second,0,i->first - k->first - k->second,100);
+           blo->setBrush(a);
+           scene->addItem((blo));
+        }
+        //设置文字显示地址
+        QGraphicsTextItem * ft = new QGraphicsTextItem();
+        QGraphicsTextItem * bt = new QGraphicsTextItem();
+        ft->setRotation(-90);
+        bt->setRotation(-90);
+        //计算位置
+        QString addt = QString::number(i->first);
+        QString st = QString::number(i->second);
+
+        if(i->second != 0)
+        {
+
+            ft->setPos(i->first + i->second/2 - 10,65);
+            ft->setPlainText(st + "k");
+            scene->addItem(ft);
+            bt->setPos(i->first,150);
+            bt->setPlainText(addt + "k");
+            scene->addItem(bt);
+        }
+
+
+
+    }
+
+    //设置进程占用地址的颜色和文字
+    for(QVector<process>::iterator i = AllocateSpace.begin();i != AllocateSpace.end();i++)
+
+    {
+        if(i->getSize() != 0)
+        {
+
+            QGraphicsRectItem * pro = new QGraphicsRectItem();
+            QBrush pr(Qt::green);
+            QGraphicsTextItem * processName = new QGraphicsTextItem();
+            QGraphicsTextItem * processSize = new QGraphicsTextItem();
+            QGraphicsTextItem * processadd = new QGraphicsTextItem();
+            //文字转向
+            processName->setRotation(-90);
+            processSize->setRotation(-90);
+            processadd->setRotation(-90);
+
+            pro->setRect(i->getAddress(),0,i->getSize(),100);
+            double mid = i->getAddress() + i->getSize()/2 -10;
+            processName->setPos(mid,70);
+            processSize->setPos(mid,40);
+            processadd->setPos(i->getAddress(),150);
+
+            QString s1 = QString::number(i->getId());
+            processName->setPlainText("p" + s1);
+            QString s2 = QString::number(i->getSize());
+            QString s3 = QString::number(i->getAddress());
+
+            processSize->setPlainText(s2 + "k");
+            processadd->setPlainText(s3 + "k");
+
+            pro->setBrush(pr);
+
+            scene->addItem(pro);
+            scene->addItem(processName);
+            scene->addItem(processSize);
+            scene->addItem(processadd);
+
+
+        }
+    }
 
 
 }
@@ -119,5 +204,30 @@ void MainWindow::firstfit(double pro_mem)
         QMessageBox m ;
         m.setText("memoery doesnot have space");
         m.exec();
+    }
+}
+
+void MainWindow::on_Add_clicked()
+{
+    double s = ui->processSize->text().toDouble();
+    ui->processSize->setText("");
+    if(ui->firstfit->isChecked())
+    {
+       qSort(FreeSpace.begin(),FreeSpace.end());
+       firstfit(s);
+    }
+    else if(ui->bestfit->isChecked())
+    {
+       //bestfit(s);
+    }
+    else if(ui->radioButton->isChecked())
+    {
+       //worstfit(s);
+    }
+    else
+    {
+           QMessageBox m ;
+           m.setText("You should determine algorithm");
+           m.exec();
     }
 }
