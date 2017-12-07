@@ -207,6 +207,17 @@ void MainWindow::firstfit(double pro_mem)
     }
 }
 
+//从小到大排序
+bool compare(const QPair<double, double>&i, const QPair<double, double>&j)
+{
+    return i.second < j.second;
+}
+void MainWindow::bestfit(double s)
+{
+    qSort(FreeSpace.begin(),FreeSpace.end(),compare);
+    firstfit(s);
+}
+
 void MainWindow::on_Add_clicked()
 {
     double s = ui->processSize->text().toDouble();
