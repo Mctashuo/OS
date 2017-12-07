@@ -5,6 +5,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 #include <QMessageBox>
+#include <process.h>
 namespace Ui {
 class MainWindow;
 }
@@ -22,13 +23,17 @@ private slots:      //槽
     void on_Show_clicked();
 
     void on_Insert_clicked();
-
+    void updateview();
+    void firstfit(double s);    //首次适应算法
 private:
     Ui::MainWindow *ui;
 
 public:
     QGraphicsScene *scene;
     QVector <QPair < double,double > > FreeSpace;
+    QVector <process> AllocateSpace;
+    //记录进程id号
+    static int id;
 };
 
 #endif // MAINWINDOW_H
